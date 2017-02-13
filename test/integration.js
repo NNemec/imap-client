@@ -1,3 +1,5 @@
+'use strict';
+
 require.config({
     baseUrl: 'lib',
     paths: {
@@ -13,7 +15,6 @@ require.config({
 });
 
 require([], function() {
-    'use strict';
 
     mocha.setup('bdd');
 

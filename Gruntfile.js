@@ -1,5 +1,6 @@
+'use strict';
+
 module.exports = function(grunt) {
-    'use strict';
 
     // Project configuration.
     grunt.initConfig({
@@ -69,14 +70,14 @@ module.exports = function(grunt) {
                     'axe-logger/axe.js',
                     'sinon/pkg/sinon.js',
                     'requirejs/require.js',
-                    'browserbox/node_modules/tcp-socket/src/*.js',
-                    'browserbox/node_modules/tcp-socket/node_modules/node-forge/js/forge.min.js',
-                    'browserbox/src/*.js',
-                    'browserbox/node_modules/wo-addressparser/src/*.js',
-                    'browserbox/node_modules/wo-utf7/src/*.js',
-                    'browserbox/node_modules/wo-imap-handler/src/*.js',
-                    'browserbox/node_modules/mimefuncs/src/*.js',
-                    'browserbox/node_modules/mimefuncs/node_modules/wo-stringencoding/dist/stringencoding.js',
+                    'emailjs-tcp-socket/src/*.js',
+                    'node-forge/js/forge.min.js',
+                    'emailjs-imap-client/src/*.js',
+                    'emailjs-addressparser/src/*.js',
+                    'emailjs-utf7/src/*.js',
+                    'emailjs-imap-handler/src/*.js',
+                    'emailjs-mime-codec/src/*.js',
+                    'emailjs-stringencoding/src/*.js',
                     'es6-promise/dist/es6-promise.js'
                 ],
                 dest: 'test/lib/'

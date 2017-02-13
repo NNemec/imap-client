@@ -338,7 +338,7 @@ describe('ImapClient local integration tests', function() {
         };
 
         ic._client.client.TIMEOUT_SOCKET_LOWER_BOUND = 20; // fails 20ms after writing to socket
-        ic._client.client.socket.ondata = function() {}; // browserbox won't be receiving data anymore
+        ic._client.client.socket.ondata = function() {}; // emailjs-imap-client won't be receiving data anymore
 
         // fire anything at the socket
         ic.listMessages({
@@ -352,7 +352,7 @@ describe('ImapClient local integration tests', function() {
             path: 'INBOX'
         }).then(function() {
             ic._listeningClient.client.TIMEOUT_SOCKET_LOWER_BOUND = 20; // fails 20ms after dropping into idle/noop
-            ic._listeningClient.client.socket.ondata = function() {}; // browserbox won't be receiving data anymore
+            ic._listeningClient.client.socket.ondata = function() {}; // emailjs-imap-client won't be receiving data anymore
 
             // the listening client does not cause an error, so we let it fail silently
             // in the background and check back after a 1 s delay

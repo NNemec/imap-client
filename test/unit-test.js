@@ -3,12 +3,12 @@
 
     if (typeof define === 'function' && define.amd) {
         ES6Promise.polyfill(); // load ES6 Promises polyfill
-        define(['chai', 'sinon', 'browserbox', 'axe', 'imap-client'], factory);
+        define(['chai', 'sinon', 'emailjs-imap-client', 'axe', 'imap-client'], factory);
     } else if (typeof exports === 'object') {
         require('es6-promise').polyfill(); // load ES6 Promises polyfill
-        module.exports = factory(require('chai'), require('sinon'), require('browserbox'), require('axe-logger'), require('../src/imap-client'));
+        module.exports = factory(require('chai'), require('sinon'), require('emailjs-imap-client'), require('axe-logger'), require('../src/imap-client'));
     }
-})(function(chai, sinon, browserbox, axe, ImapClient) {
+})(function(chai, sinon, emailjsImapClient, axe, ImapClient) {
     'use strict';
 
     // don't log in the tests
@@ -21,7 +21,7 @@
         var imap, bboxMock;
 
         beforeEach(function() {
-            bboxMock = sinon.createStubInstance(browserbox);
+            bboxMock = sinon.createStubInstance(emailjsImapClient);
             imap = new ImapClient({}, bboxMock);
 
             expect(imap._client).to.equal(bboxMock);

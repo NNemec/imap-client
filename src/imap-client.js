@@ -2,11 +2,11 @@
     'use strict';
 
     if (typeof define === 'function' && define.amd) {
-        define(['browserbox', 'axe'], factory);
+        define(['emailjs-imap-client', 'axe'], factory);
     } else if (typeof exports === 'object') {
-        module.exports = factory(require('browserbox'), require('axe-logger'));
+        module.exports = factory(require('emailjs-imap-client'), require('axe-logger'));
     }
-})(function(BrowserBox, axe) {
+})(function(EmailjsImapClient, axe) {
     'use strict';
 
     var DEBUG_TAG = 'imap-client';
@@ -22,7 +22,7 @@
      * @param {Array} options.ca Array of PEM-encoded certificates that should be pinned.
      * @param {Number} options.maxUpdateSize (optional) The maximum number of messages to receive in an onSyncUpdate of type "new". 0 = all messages. Defaults to 0.
      */
-    var ImapClient = function(options, browserbox) {
+    var ImapClient = function(options, emailjsImapClient) {
         var self = this;
 
         /*
@@ -35,8 +35,8 @@
          * Instance of our imap library
          * (only relevant in unit test environment)
          */
-        if (browserbox) {
-            self._client = self._listeningClient = browserbox;
+        if (emailjsImapClient) {
+            self._client = self._listeningClient = emailjsImapClient;
         } else {
             var credentials = {
                 useSecureTransport: options.secure,
@@ -48,8 +48,8 @@
                 enableCompression: true, // enable compression by default
                 compressionWorkerPath: options.compressionWorkerPath
             };
-            self._client = new BrowserBox(options.host, options.port, credentials);
-            self._listeningClient = new BrowserBox(options.host, options.port, credentials);
+            self._client = new EmailjsImapClient(options.host, options.port, credentials);
+            self._listeningClient = new EmailjsImapClient(options.host, options.port, credentials);
         }
 
         /*
@@ -126,7 +126,7 @@
     };
 
     /**
-     * Executed whenever 'onselectmailbox' event is emitted in BrowserBox
+     * Executed whenever 'onselectmailbox' event is emitted in EmailjsImapClient
      *
      * @param {Object} client Listening client object
      * @param {String} path Path to currently opened mailbox
@@ -1052,7 +1052,7 @@
     //
 
     /**
-     * Makes sure that the respective instance of browserbox is in the correct mailbox to run the command
+     * Makes sure that the respective instance of emailjsImapClient is in the correct mailbox to run the command
      *
      * @param {String} path The mailbox path
      */
