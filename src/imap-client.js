@@ -418,24 +418,15 @@
                 axe.debug(DEBUG_TAG, 'refusing login while already logged in!');
                 return resolve();
             }
-            var authenticating = true;
 
-            self._client.onauth = function() {
+            self._client.connect().then(function() {
                 axe.debug(DEBUG_TAG, 'login completed, ready to roll!');
                 self._loggedIn = true;
-                authenticating = false;
-                return resolve();
-            };
-
-            self._client.onerror = function(error) {
-                if (!self._loggedIn && authenticating) {
-                    axe.debug(DEBUG_TAG, 'login failed! ' + error);
-                    authenticating = false;
-                    return reject(error);
-                }
-            };
-
-            self._client.connect();
+                resolve();
+            }).catch(function(error) {
+                axe.debug(DEBUG_TAG, 'login failed! ' + error);
+                reject(error);
+            });
         });
     };
 
@@ -453,13 +444,11 @@
                 return resolve();
             }
 
-            self._client.onclose = function() {
+            self._loggedIn = false;
+            self._client.close().then(function() {
                 axe.debug(DEBUG_TAG, 'logout completed, kthxbye!');
                 resolve();
-            };
-
-            self._loggedIn = false;
-            self._client.close();
+            });
         });
     };
 
