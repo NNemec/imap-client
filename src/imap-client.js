@@ -688,11 +688,7 @@
         var self = this,
             client = options.client || self._client;
 
-        var query = {},
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path, client)
-            };
+        var query = {};
 
         // initial request to AND the following properties
         query.all = true;
@@ -719,7 +715,7 @@
 
         axe.debug(DEBUG_TAG, 'searching in ' + options.path + ' for ' + Object.keys(query).join(','));
         return self._checkOnline().then(function() {
-            return client.search(query, queryOptions);
+            return client.search(options.path, query, { byUid: true });
         }).then(function(uids) {
             axe.debug(DEBUG_TAG, 'searched in ' + options.path + ' for ' + Object.keys(query).join(',') + ': ' + uids);
             return uids;
@@ -742,10 +738,6 @@
         var self = this;
 
         var query = ['uid', 'bodystructure', 'flags', 'envelope', 'body.peek[header.fields (references)]'],
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path)
-            },
             interval;
 
         if (options.uids) {
@@ -761,7 +753,7 @@
 
         axe.debug(DEBUG_TAG, 'listing messages in ' + options.path + ' for interval ' + interval);
         return self._checkOnline().then(function() {
-            return self._client.listMessages(interval, query, queryOptions);
+            return self._client.listMessages(options.path, interval, query, { byUid: true });
         }).then(function(messages) {
             // a message without uid will be ignored as malformed
             messages = messages.filter(function(message) {
@@ -825,10 +817,6 @@
     ImapClient.prototype.getBodyParts = function(options) {
         var self = this,
             query = [],
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path)
-            },
             interval = options.uid + ':' + options.uid,
             bodyParts = options.bodyParts || [];
 
@@ -854,7 +842,7 @@
 
         axe.debug(DEBUG_TAG, 'retrieving body parts for uid ' + options.uid + ' in folder ' + options.path + ': ' + query);
         return self._checkOnline().then(function() {
-            return self._client.listMessages(interval, query, queryOptions);
+            return self._client.listMessages(options.path, interval, query, { byUid: true });
         }).then(function(messages) {
             axe.debug(DEBUG_TAG, 'successfully retrieved body parts for uid ' + options.uid + ' in folder ' + options.path + ': ' + query);
 
@@ -898,10 +886,6 @@
     ImapClient.prototype.updateFlags = function(options) {
         var self = this,
             interval = options.uid + ':' + options.uid,
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path)
-            },
             queryAdd,
             queryRemove,
             remove = [],
@@ -945,14 +929,14 @@
         return self._checkOnline().then(function() {
             return new Promise(function(resolve) {
                 if (add.length > 0) {
-                    resolve(self._client.setFlags(interval, queryAdd, queryOptions));
+                    resolve(self._client.setFlags(options.path, interval, queryAdd, { byUid: true }));
                 } else {
                     resolve();
                 }
             });
         }).then(function() {
             if (remove.length > 0) {
-                return self._client.setFlags(interval, queryRemove, queryOptions);
+                return self._client.setFlags(options.path, interval, queryRemove, { byUid: true });
             }
         }).then(function() {
             axe.debug(DEBUG_TAG, 'successfully updated flags for uid ' + options.uid + ' in folder ' + options.path + ': added ' + add + ' and removed ' + remove);
@@ -972,15 +956,11 @@
      */
     ImapClient.prototype.moveMessage = function(options) {
         var self = this,
-            interval = options.uid + ':' + options.uid,
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path)
-            };
+            interval = options.uid + ':' + options.uid;
 
         axe.debug(DEBUG_TAG, 'moving uid ' + options.uid + ' from ' + options.path + ' to ' + options.destination);
         return self._checkOnline().then(function() {
-            return self._client.moveMessages(interval, options.destination, queryOptions);
+            return self._client.moveMessages(options.path, interval, options.destination, { byUid: true });
         }).then(function() {
             axe.debug(DEBUG_TAG, 'successfully moved uid ' + options.uid + ' from ' + options.path + ' to ' + options.destination);
         }).catch(function(error) {
@@ -1019,15 +999,11 @@
      */
     ImapClient.prototype.deleteMessage = function(options) {
         var self = this,
-            interval = options.uid + ':' + options.uid,
-            queryOptions = {
-                byUid: true,
-                precheck: self._ensurePath(options.path)
-            };
+            interval = options.uid + ':' + options.uid;
 
         axe.debug(DEBUG_TAG, 'deleting uid ' + options.uid + ' from ' + options.path);
         return self._checkOnline().then(function() {
-            return self._client.deleteMessages(interval, queryOptions);
+            return self._client.deleteMessages(options.path, interval, { byUid: true });
         }).then(function() {
             axe.debug(DEBUG_TAG, 'successfully deleted uid ' + options.uid + ' from ' + options.path);
         }).catch(function(error) {
@@ -1039,27 +1015,6 @@
     //
     // Helper methods
     //
-
-    /**
-     * Makes sure that the respective instance of emailjsImapClient is in the correct mailbox to run the command
-     *
-     * @param {String} path The mailbox path
-     */
-    ImapClient.prototype._ensurePath = function(path, client) {
-        var self = this;
-        client = client || self._client;
-
-        return function(ctx, next) {
-            if (client.selectedMailbox === path) {
-                return next();
-            }
-
-            axe.debug(DEBUG_TAG, 'selecting mailbox ' + path);
-            client.selectMailbox(path, {
-                ctx: ctx
-            }, next);
-        };
-    };
 
     ImapClient.prototype._checkOnline = function() {
         var self = this;
