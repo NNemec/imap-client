@@ -11,6 +11,8 @@
 
     var DEBUG_TAG = 'imap-client';
 
+    axe.logLevel = axe.INFO;
+
     /**
      * Create an instance of ImapClient.
      * @param {Number} options.port Port is the port to the server (defaults to 143 on non-secure and to 993 on secure connection).
@@ -50,6 +52,9 @@
             };
             self._client = new EmailjsImapClient(options.host, options.port, credentials);
             self._listeningClient = new EmailjsImapClient(options.host, options.port, credentials);
+            
+            self._client.logLevel = ImapClient.LOG_LEVEL_INFO;
+            self._listeningClient.logLevel = ImapClient.LOG_LEVEL_INFO;
         }
 
         /*
